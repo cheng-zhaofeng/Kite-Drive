@@ -297,6 +297,27 @@
             color: #cfe3ff;
             word-break: break-all;
         }
+
+        .result-panel .tx-hash {
+            display: block;
+            margin-top: 6px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            background: rgba(22, 119, 255, 0.1);
+            border: 1px solid rgba(22, 119, 255, 0.3);
+            font-size: 10px;
+            font-family: 'SF Mono', 'Menlo', monospace;
+            color: #9fd4ff;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .result-panel .tx-label {
+            font-size: 11px;
+            color: #9abac4;
+            margin-bottom: 2px;
+        }
     </style>
 </head>
 <body>
@@ -548,13 +569,13 @@
                 const summary = data?.llm?.summary || '规则引擎已完成选择';
                 const fakeTx = '0x' + Math.random().toString(16).slice(2).padEnd(64, '0').slice(0, 64);
                 const txHash = payment?.txHash || fakeTx;
-                const payLine = '支付Tx：' + txHash;
                 resultText.innerHTML =
                     '已选车位：' + (chosen?.name || chosen?.id) + '<br>' +
                     'ETA：' + chosen?.etaMin + ' 分钟<br>' +
                     '成本：$' + chosen?.totalCostUsd + '<br>' +
-                    '解释：' + summary + '<br>' +
-                    payLine;
+                    '解释：' + summary +
+                    '<div class="tx-label">支付 Tx：</div>' +
+                    '<div class="tx-hash">' + txHash + '</div>';
                 if (agentThoughts) {
                     const stats = data?.agent?.stats || {};
                     const total = stats.totalSpots ?? 5;
