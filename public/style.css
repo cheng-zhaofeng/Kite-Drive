@@ -1,0 +1,443 @@
+
+        :root {
+            --bg-color: #0a0a0f;
+            --panel-bg: rgba(15, 20, 35, 0.6);
+            --accent-color: #00d9ff;
+            --accent-secondary: #00b8cc;
+            --border-color: rgba(0, 217, 255, 0.15);
+            --success-color: #00ff88;
+            --text-primary: #e0f7ff;
+            --text-secondary: #88b8d4;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a0a2e 50%, #16213e 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            font-family: -apple-system, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+
+        /* 主容器：左右布局 */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            height: 100vh;
+            gap: 12px;
+            padding: 12px;
+            box-sizing: border-box;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* 视频容器通用样式 */
+        .video-block {
+            position: relative;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 217, 255, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .video-block:hover {
+            border-color: rgba(0, 217, 255, 0.3);
+            box-shadow: 0 12px 48px rgba(0, 217, 255, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.85;
+            transition: opacity 0.3s ease;
+        }
+
+        .label {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 10;
+            border-left: 3px solid var(--accent-color);
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.4);
+            backdrop-filter: blur(4px);
+        }
+
+        /* --- 左侧区域 --- */
+        .main-view {
+            position: relative;
+        }
+
+        .main-view .reserve-btn {
+            position: absolute;
+            left: 20px;
+            bottom: 20px;
+            z-index: 30;
+            background: linear-gradient(135deg, #00d9ff 0%, #0099bb 100%);
+            color: #001a28;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0, 217, 255, 0.3), 0 0 20px rgba(0, 217, 255, 0.2);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .main-view .reserve-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(0, 217, 255, 0.4), 0 0 30px rgba(0, 217, 255, 0.3);
+        }
+
+        .main-view .reserve-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 16px rgba(0, 217, 255, 0.25);
+        }
+
+        /* 隐藏按钮的类 */
+        .hidden {
+            display: none !important;
+        }
+
+        /* 地图叠加层 */
+        .map-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 180px;
+            background: rgba(15, 25, 45, 0.95);
+            border: 2px solid var(--accent-color);
+            border-radius: 16px;
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.4), inset 0 0 20px rgba(0, 217, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            backdrop-filter: blur(10px);
+        }
+
+        /* --- 右侧侧边栏 --- */
+        .sidebar {
+            display: grid;
+            grid-template-rows: auto 0.9fr 1.5fr;
+            gap: 12px;
+        }
+
+        /* 特殊装饰 */
+        .map-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .scanning-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+            top: 0;
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .result-panel {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            width: 320px;
+            padding: 16px;
+            background: rgba(10, 25, 40, 0.95);
+            border: 1px solid rgba(0, 217, 255, 0.4);
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0, 217, 255, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+            font-size: 12px;
+            line-height: 1.6;
+            z-index: 25;
+            backdrop-filter: blur(12px);
+        }
+
+        .result-panel h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.4);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .result-panel .muted {
+            opacity: 0.75;
+            color: var(--text-secondary);
+        }
+
+        .agent-bubble {
+            background: rgba(10, 25, 40, 0.8);
+            border: 1px solid rgba(0, 217, 255, 0.25);
+            border-left: 3px solid var(--accent-color);
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 11px;
+            line-height: 1.5;
+            color: var(--text-primary);
+            box-shadow: 0 4px 16px rgba(0, 217, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(6px);
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .agent-bubble.emphasis {
+            background: rgba(0, 50, 80, 0.9);
+            border-color: rgba(0, 217, 255, 0.5);
+            box-shadow: 0 6px 20px rgba(0, 217, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .panel-inner {
+            position: absolute;
+            inset: 38px 10px 10px 10px;
+            overflow: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 217, 255, 0.3) transparent;
+        }
+
+        /* 车辆信息面板按内容高度收缩：取消绝对定位限制，让 panel 自然结束于 .pill-row 之下 */
+        #vehiclePanel .panel-inner {
+            position: relative;
+            inset: auto;
+            overflow: visible;
+            padding: 12px 10px 20px 10px; /* 增加底部内边距，防止与下方元素重叠 */
+        }
+
+        /* 给 vehiclePanel 本体留下额外底部间距，避免与下方面板重叠 */
+        #vehiclePanel {
+            padding-bottom: 8px;
+        }
+
+        .panel-inner::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .panel-inner::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .panel-inner::-webkit-scrollbar-thumb {
+            background: rgba(0, 217, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .panel-inner::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 217, 255, 0.5);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 36px;
+    
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(0, 40, 60, 0.8), rgba(0, 60, 100, 0.4));
+            border: 1px solid rgba(0, 217, 255, 0.25);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 16px rgba(0, 217, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .stat-card:hover {
+            border-color: rgba(0, 217, 255, 0.4);
+            box-shadow: 0 6px 20px rgba(0, 217, 255, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .stat-title {
+            font-size: 11px;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 4px;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.15), rgba(0, 150, 200, 0.1));
+            border: 1px solid rgba(0, 217, 255, 0.35);
+            font-size: 11px;
+            color: var(--accent-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(6px);
+        }
+
+        .pill-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            align-items: center;
+        }
+
+        .pill:hover {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.25), rgba(0, 150, 200, 0.15));
+            border-color: rgba(0, 217, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.2);
+        }
+
+        .battery-track {
+            height: 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            margin-top: 8px;
+            border: 1px solid rgba(0, 217, 255, 0.15);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .battery-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            width: 0%;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+        }
+
+        .payment-shell {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .payment-progress {
+            height: 6px;
+            background: rgba(0, 217, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .payment-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00d9ff, #0099cc);
+            transition: width 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+        }
+
+        .payment-step {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: rgba(0, 30, 50, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.15);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(6px);
+        }
+
+        .payment-step:hover {
+            border-color: rgba(0, 217, 255, 0.3);
+            background: rgba(0, 40, 70, 0.7);
+        }
+
+        .payment-step .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(0, 217, 255, 0.3);
+            margin-top: 3px;
+            flex-shrink: 0;
+            transition: all 0.4s ease;
+            border: 2px solid rgba(0, 217, 255, 0.2);
+            box-shadow: 0 0 8px rgba(0, 217, 255, 0.2);
+        }
+
+        .payment-step.done .dot {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.6), inset 0 0 4px rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .payment-step .title {
+            font-size: 12px;
+            color: var(--text-primary);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .payment-step .desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        .hash-pill {
+            font-size: 11px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(0, 100, 200, 0.15), rgba(30, 100, 220, 0.1));
+            border: 1px solid rgba(30, 100, 220, 0.4);
+            color: #88ccff;
+            word-break: break-all;
+            line-height: 1.5;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(6px);
+        }
+
+        .hash-pill:hover {
+            border-color: rgba(30, 100, 220, 0.6);
+            background: linear-gradient(135deg, rgba(0, 100, 200, 0.25), rgba(30, 100, 220, 0.15));
+            box-shadow: 0 0 15px rgba(30, 100, 220, 0.2);
+        }
+  
