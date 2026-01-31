@@ -16,14 +16,21 @@ function decideParkingWithScenarios({ scenario, spots }) {
 
   // 1) 白名单
   let candidates = spots.filter(s => s.kiteCertified);
+  const stats = {
+    totalSpots: spots.length,
+    kiteCertifiedCount: candidates.length,
+    deadlineMin: scenario.deadlineMin
+  };
   addThought("我先筛掉不可信的停车场，只保留通过 Kite 认证的候选。");
+  addThought("接下来我会对这些候选做更细致的可达性与体验评估。");
 
   if (scenario.needCharging) {
     const before = candidates.length;
     candidates = candidates.filter(s => s.hasCharging);
+    stats.chargingFilteredCount = candidates.length;
     addThought("你的车需要充电，所以我只保留带充电桩的车位。");
     if (candidates.length === 0) {
-      return { ok: false, thoughts, reason: "No charger-capable spot available" };
+      return { ok: false, thoughts, reason: "No charger-capable spot available", stats };
     }
   }
 
@@ -48,15 +55,19 @@ function decideParkingWithScenarios({ scenario, spots }) {
     };
   });
 
+  stats.enrichedCount = enriched.length;
   addThought("我评估了每个候选车位的到达时间和总费用。");
+  addThought("同时考虑排队时间，避免你到达后仍需要等待。");
 
   // 3) 截止时间约束（如果 deadline 很紧）
   const feasible = enriched.filter(x => x.etaMin <= scenario.deadlineMin);
+  stats.feasibleCount = feasible.length;
   addThought("考虑到你的时间限制，我筛出了能按时到达的选项。");
+  addThought("如果可行选项很少，我会优先保证准时性。");
 
   if (feasible.length === 0) {
     // 紧急场景：返回“都来不及”的结果，前端可展示“无法满足”
-    return { ok: false, thoughts, reason: "No feasible option meets the deadline", candidates: enriched };
+    return { ok: false, thoughts, reason: "No feasible option meets the deadline", candidates: enriched, stats };
   }
 
   // 4) 评分（可展示）
@@ -79,11 +90,13 @@ function decideParkingWithScenarios({ scenario, spots }) {
   const best = scored[0];
 
   addThought("最后我在速度和成本之间做了权衡，选出综合体验最好的车位。");
+  addThought("我会优先让你按时到达，同时控制预算不要过高。");
   addThought(`我建议选择 ${best.name}，预计 ${best.etaMin} 分钟可到，费用约 $${best.totalCostUsd}。`);
 
   return {
     ok: true,
     thoughts,
+    stats,
     decision: {
       id: best.id,
       name: best.name,
