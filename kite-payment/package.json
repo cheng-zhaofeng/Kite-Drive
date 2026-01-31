@@ -1,0 +1,17 @@
+{
+  "name": "gokite-aa-transfer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/transfer.js",
+    "transfer": "node src/transfer.js",
+    "withdraw": "node src/withdraw.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ethers": "^6.11.1",
+    "gokite-aa-sdk": "^1.0.0",
+    "ini": "^4.1.1"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "A": { "name": "CBD Office", "lat": 31.2300, "lng": 121.4737 },
+  "B": { "name": "Tech Park", "lat": 31.2050, "lng": 121.6000 },
+  "C": { "name": "Airport", "lat": 31.1443, "lng": 121.8083 },
+  "D": { "name": "Convention Center", "lat": 31.1900, "lng": 121.5000 },
+  "E": { "name": "University", "lat": 31.3000, "lng": 121.5200 }
+}

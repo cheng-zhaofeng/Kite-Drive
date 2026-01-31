@@ -1,0 +1,14 @@
+{
+  "name": "kite-drive-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "local": "node scripts/local-dev.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "ethers": "^6.16.0",
+    "gokite-aa-sdk": "^1.0.14"
+  }
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "id": "PARK_A",
+    "name": "A Parking (cheaper, queue)",
+    "providerAddress": "0x1111111111111111111111111111111111111111",
+    "distanceKm": 1.2,
+    "pricePerHour": 0.8,
+    "queueMin": 15,
+    "kiteCertified": true
+  },
+  {
+    "id": "PARK_B",
+    "name": "B Parking (expensive, no queue)",
+    "providerAddress": "0x2222222222222222222222222222222222222222",
+    "distanceKm": 2.5,
+    "pricePerHour": 1.1,
+    "queueMin": 0,
+    "kiteCertified": true
+  },
+  {
+    "id": "PARK_C",
+    "name": "C Parking (not certified)",
+    "providerAddress": "0x3333333333333333333333333333333333333333",
+    "distanceKm": 0.9,
+    "pricePerHour": 0.6,
+    "queueMin": 5,
+    "kiteCertified": false
+  }
+]

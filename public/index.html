@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>未来车载智能座舱 UI</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0b;
+            --panel-bg: rgba(25, 25, 28, 0.8);
+            --accent-color: #00f2ff;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            overflow: hidden;
+        }
+
+        /* 主容器：左右布局 */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 350px; /* 左侧大屏，右侧侧边栏 */
+            height: 100vh;
+            gap: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* 视频容器通用样式 */
+        .video-block {
+            position: relative;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7; /* 增加通透感 */
+        }
+
+        .label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 10;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        /* --- 左侧区域 --- */
+        .main-view {
+            position: relative;
+        }
+
+        .main-view .reserve-btn {
+            position: absolute;
+            left: 20px;
+            bottom: 20px;
+            z-index: 30;
+            background: linear-gradient(180deg, #00f2ff, #0088aa);
+            color: #001016;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(0,242,255,0.12);
+        }
+
+        .main-view .reserve-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* 地图叠加层 */
+        .map-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 180px;
+            background: rgba(20, 24, 35, 0.9);
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+
+        /* --- 右侧侧边栏 --- */
+        .sidebar {
+            display: grid;
+            grid-template-rows: 1fr 2fr 1.5fr; /* 对应PRD的三个高度比例 */
+            gap: 10px;
+        }
+
+        /* 特殊装饰 */
+        .map-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .scanning-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+            top: 0;
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        .result-panel {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            width: 320px;
+            padding: 12px;
+            background: rgba(10, 12, 18, 0.85);
+            border: 1px solid rgba(0, 242, 255, 0.35);
+            border-radius: 10px;
+            box-shadow: 0 0 16px rgba(0, 242, 255, 0.2);
+            font-size: 12px;
+            line-height: 1.5;
+            z-index: 25;
+        }
+
+        .result-panel h3 {
+            margin: 0 0 6px 0;
+            font-size: 13px;
+            color: #9ff7ff;
+        }
+
+        .result-panel .muted {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+    <div class="video-block main-view">
+        <div class="label">车内无人驾驶画面</div>
+        <video id="mainVideo" autoplay muted loop poster="https://via.placeholder.com/1200x800/111/fff?text=Driving+View">
+            <source src="v1.mp4" type="video/mp4">
+        </video>
+        <button id="reserveBtn" class="reserve-btn">预定车位停车</button>
+        <div id="resultPanel" class="result-panel" style="display:none;">
+            <h3>预定结果</h3>
+            <div id="resultText" class="muted">等待请求...</div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="video-block">
+            <div class="label">车辆信息显示</div>
+            <video autoplay muted loop poster="https://via.placeholder.com/400x300/222/00f2ff?text=Vehicle+Stats">
+                </video>
+        </div>
+
+        <div class="video-block" id="agentPanel">
+            <div class="label">AI Agent 思考中...</div>
+            <div id="agentThoughts" style="position:absolute; inset:36px 12px 12px 12px; overflow:auto; font-size:12px; line-height:1.5; opacity:0.85; white-space:pre-wrap;"></div>
+        </div>
+
+        <div class="video-block">
+            <div class="label">账户余额 / 收据NFT</div>
+            <video autoplay muted loop poster="https://via.placeholder.com/400x300/333/fff?text=Transaction+History">
+                </video>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){
+    const video = document.getElementById('mainVideo');
+    const btn = document.getElementById('reserveBtn');
+    const resultPanel = document.getElementById('resultPanel');
+    const resultText = document.getElementById('resultText');
+    const agentThoughts = document.getElementById('agentThoughts');
+    if(!video || !btn) return;
+
+    btn.addEventListener('click', startSequence);
+
+    async function startSequence(){
+        btn.style.display = 'none';
+        video.loop = false;
+        if (resultPanel && resultText) {
+            resultPanel.style.display = 'block';
+            resultText.textContent = '正在请求车位与支付...';
+        }
+        if (agentThoughts) {
+            agentThoughts.textContent = 'Agent 思考中...\n- 读取场景与候选车位\n- 计算 ETA 与成本\n- 选择最优方案\n- 发起支付';
+        }
+
+        try {
+            const resp = await fetch('/api/reserve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ scenarioId: 'MEETING_URGENT_OK' })
+            });
+            const data = await resp.json();
+            if (resp.ok && data?.ok) {
+                const chosen = data?.chosen;
+                const payment = data?.payment;
+                const summary = data?.llm?.summary || '规则引擎已完成选择';
+                const payLine = payment?.txHash
+                    ? ('支付Tx：' + payment.txHash)
+                    : (payment?.error ? ('支付失败：' + payment.error) : '支付状态：未知');
+                resultText.innerHTML =
+                    '已选车位：' + (chosen?.name || chosen?.id) + '<br>' +
+                    'ETA：' + chosen?.etaMin + ' 分钟<br>' +
+                    '成本：$' + chosen?.totalCostUsd + '<br>' +
+                    '解释：' + summary + '<br>' +
+                    payLine;
+                if (agentThoughts) {
+                    const thoughts = data?.agent?.thoughts || [];
+                    const lines = thoughts.length ? thoughts.map(t => '- ' + t).join('\n') : '- 暂无思考日志';
+                    agentThoughts.textContent = 'Agent 思考过程:\n' + lines;
+                }
+            } else {
+                const reason = data?.agent?.reason || data?.error || '请求失败';
+                resultText.textContent = '失败：' + reason;
+                if (agentThoughts) {
+                    const thoughts = data?.agent?.thoughts || [];
+                    const lines = thoughts.length ? thoughts.map(t => '- ' + t).join('\n') : '- 暂无思考日志';
+                    agentThoughts.textContent = 'Agent 思考过程:\n' + lines;
+                }
+            }
+        } catch (e) {
+            if (resultText) resultText.textContent = '网络错误：' + (e?.message || e);
+            if (agentThoughts) agentThoughts.textContent = 'Agent 思考失败：网络错误';
+        }
+
+        const seq = ['v2.mp4','v4.mp4'];
+        let idx = 0;
+        playNext();
+
+        function playNext(){
+            if(idx < seq.length){
+                video.src = seq[idx];
+                video.load();
+                video.play().catch(()=>{});
+
+                if(seq[idx] === 'v4.mp4'){
+                    const onTime = function(){
+                        if(video.duration && video.currentTime >= video.duration - 0.05){
+                            video.removeEventListener('timeupdate', onTime);
+                            video.pause();
+                            setTimeout(()=>{ idx++; playNext(); }, 2000);
+                        }
+                    };
+                    video.addEventListener('timeupdate', onTime);
+
+                    const onEnded = function(){
+                        video.removeEventListener('ended', onEnded);
+                        setTimeout(()=>{ idx++; playNext(); }, 2000);
+                    };
+                    video.addEventListener('ended', onEnded);
+                } else {
+                    video.onended = function(){ video.onended = null; idx++; playNext(); };
+                }
+            } else {
+                // 切换到 v3 并恢复按钮
+                video.src = 'v3.mp4';
+                video.load();
+                video.play().catch(()=>{});
+                video.loop = true;
+                btn.style.display = 'block';
+            }
+        }
+    }
+})();
+</script>
+
+</body>
+</html>

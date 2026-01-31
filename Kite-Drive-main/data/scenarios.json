@@ -1,0 +1,59 @@
+[
+  {
+    "id": "MEETING_URGENT",
+    "title": "10分钟内赶到 D 开会（极紧急）",
+    "current": "A",
+    "destination": "D",
+    "deadlineMin": 10,
+    "urgency": "high",
+    "needCharging": false,
+    "batteryPct": 45,
+    "parkingHours": 1
+  },
+  {
+    "id": "MEETING_NORMAL",
+    "title": "40分钟内到 D（一般紧急）",
+    "current": "A",
+    "destination": "D",
+    "deadlineMin": 40,
+    "urgency": "normal",
+    "needCharging": false,
+    "batteryPct": 50,
+    "parkingHours": 2
+  },
+  {
+    "id": "LOW_BATTERY",
+    "title": "电量15%，需要尽快去充电并停车",
+    "current": "B",
+    "destination": "B",
+    "deadlineMin": 30,
+    "urgency": "high",
+    "needCharging": true,
+    "batteryPct": 15,
+    "parkingHours": 1,
+    "needKwh": 12
+  },
+  {
+    "id": "COST_SAVER",
+    "title": "不赶时间，尽量省钱停车",
+    "current": "E",
+    "destination": "A",
+    "deadlineMin": 90,
+    "urgency": "low",
+    "needCharging": false,
+    "batteryPct": 60,
+    "parkingHours": 3
+  },
+  {
+  "id": "MEETING_URGENT_OK",
+  "title": "15分钟内赶到 D 开会（紧急但可行）",
+  "current": "A",
+  "destination": "D",
+  "deadlineMin": 15,
+  "urgency": "high",
+  "needCharging": false,
+  "batteryPct": 45,
+  "parkingHours": 1
+}
+
+]

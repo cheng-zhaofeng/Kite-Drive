@@ -1,0 +1,57 @@
+[
+  {
+    "id": "P1",
+    "name": "Budget Lot near A",
+    "near": "A",
+    "providerAddress": "0x2222222222222222222222222222222222222222",
+    "pricePerHourUsd": 5,
+    "queueMin": 8,
+    "kiteCertified": true,
+    "hasCharging": false,
+    "chargingPricePerKwhUsd": null
+  },
+  {
+    "id": "P2",
+    "name": "Premium Garage near A",
+    "near": "A",
+    "providerAddress": "0x2222222222222222222222222222222222222222",
+    "pricePerHourUsd": 20,
+    "queueMin": 0,
+    "kiteCertified": true,
+    "hasCharging": true,
+    "chargingPricePerKwhUsd": 0.55
+  },
+  {
+    "id": "P3",
+    "name": "Tech Park Lot (B)",
+    "near": "B",
+    "providerAddress": "0x2222222222222222222222222222222222222222",
+    "pricePerHourUsd": 8,
+    "queueMin": 5,
+    "kiteCertified": true,
+    "hasCharging": true,
+    "chargingPricePerKwhUsd": 0.40
+  },
+  {
+    "id": "P4",
+    "name": "Airport Long Stay (C)",
+    "near": "C",
+    "providerAddress": "0x2222222222222222222222222222222222222222",
+    "pricePerHourUsd": 6,
+    "queueMin": 2,
+    "kiteCertified": true,
+    "hasCharging": false,
+    "chargingPricePerKwhUsd": null
+  },
+  {
+    "id": "P5",
+    "name": "Convention Center Garage (D)",
+    "near": "D",
+    "providerAddress": "0x2222222222222222222222222222222222222222",
+    "pricePerHourUsd": 12,
+    "queueMin": 12,
+    "kiteCertified": true,
+    "hasCharging": true,
+    "chargingPricePerKwhUsd": 0.65
+  }
+]
