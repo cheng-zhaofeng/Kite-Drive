@@ -10,6 +10,8 @@ function readJson(relPath) {
   return JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
 }
 
+
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     res.statusCode = 405;

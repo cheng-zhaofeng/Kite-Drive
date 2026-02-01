@@ -319,13 +319,14 @@
             margin-bottom: 2px;
         }
     </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="dashboard">
     <div class="video-block main-view">
         <div class="label">车内无人驾驶画面</div>
-        <video id="mainVideo" autoplay muted loop poster="https://via.placeholder.com/1200x800/111/fff?text=Driving+View">
+        <video id="mainVideo" autoplay muted poster="https://via.placeholder.com/1200x800/111/fff?text=Driving+View">
             <source src="v1.mp4" type="video/mp4">
         </video>
         <button id="reserveBtn" class="reserve-btn">预定车位停车</button>
@@ -360,7 +361,7 @@
                         <div id="statusValue" class="stat-value">--</div>
                     </div>
                 </div>
-                <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+                <div class="pill-row">
                     <div id="routeTag" class="pill">路线：未规划</div>
                     <div id="modeTag" class="pill">模式：自动驾驶</div>
                 </div>
