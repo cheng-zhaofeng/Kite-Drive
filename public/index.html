@@ -396,6 +396,7 @@
     const routeTag = document.getElementById('routeTag');
     const modeTag = document.getElementById('modeTag');
     if(!video || !btn) return;
+    video.loop = true;
 
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     let agentQueue = Promise.resolve();
@@ -424,7 +425,7 @@
     }
 
     function runAgentFlow(container, lines, { reset = false, delay = 18, gap = 280 } = {}) {
-        if (!container) return;
+        if (!container) return Promise.resolve();
         if (reset) {
             container.innerHTML = '';
             agentQueue = Promise.resolve();
@@ -434,6 +435,7 @@
                 .then(() => typeLine(container, line, delay))
                 .then(() => sleep(gap));
         });
+        return agentQueue;
     }
 
     function renderVehicleInfo(state) {
@@ -532,11 +534,41 @@
 
     btn.addEventListener('click', startSequence);
 
+    function playVideo(src, { onStart, stopNearEnd = false } = {}) {
+        return new Promise((resolve) => {
+            const cleanup = () => {
+                video.removeEventListener('ended', onEnded);
+                video.removeEventListener('timeupdate', onTime);
+            };
+            const onEnded = () => {
+                cleanup();
+                resolve();
+            };
+            const onTime = () => {
+                if (video.duration && video.currentTime >= video.duration - 0.05) {
+                    cleanup();
+                    video.pause();
+                    resolve();
+                }
+            };
+            video.onended = null;
+            video.loop = false;
+            video.src = src;
+            video.load();
+            video.play().catch(() => {});
+            if (typeof onStart === 'function') {
+                video.addEventListener('play', () => onStart(), { once: true });
+            }
+            video.addEventListener('ended', onEnded);
+            if (stopNearEnd) video.addEventListener('timeupdate', onTime);
+        });
+    }
+
     async function startSequence(){
         btn.style.display = 'none';
-        video.loop = false;
+        video.loop = true;
         if (resultPanel && resultText) {
-            resultPanel.style.display = 'block';
+            resultPanel.style.display = 'none';
             resultText.textContent = '正在请求车位与支付...';
         }
         if (agentThoughts) {
@@ -577,6 +609,7 @@
                     '解释：' + summary +
                     '<div class="tx-label">支付 Tx：</div>' +
                     '<div class="tx-hash">' + txHash + '</div>';
+                let agentDone = Promise.resolve();
                 if (agentThoughts) {
                     const stats = data?.agent?.stats || {};
                     const total = stats.totalSpots ?? 5;
@@ -595,7 +628,7 @@
                         '支付完成后自动规划行车路径，准备入场泊车。',
                         '✅ 建议方案已完成。'
                     ];
-                    runAgentFlow(agentThoughts, steps);
+                    agentDone = runAgentFlow(agentThoughts, steps);
                 }
                 if (paymentLog) {
                     runPaymentFlow(paymentLog, {
@@ -612,8 +645,32 @@
                     mode: '自动驾驶'
                 });
                 renderVehicleInfo(vehicleState);
+
+                await agentDone;
+                await playVideo('v4.mp4', {
+                    stopNearEnd: true,
+                    onStart: () => {
+                        if (resultPanel) {
+                            setTimeout(() => {
+                                resultPanel.style.display = 'block';
+                            }, 500);
+                        }
+                    }
+                });
+                await playVideo('v2.mp4');
+                await playVideo('v3.mp4');
+
+                video.src = 'v1.mp4';
+                video.loop = true;
+                video.load();
+                video.play().catch(() => {});
+                if (agentThoughts) agentThoughts.innerHTML = '';
+                if (resultPanel) resultPanel.style.display = 'none';
+                if (resultText) resultText.textContent = '等待请求...';
+                btn.style.display = 'block';
             } else {
                 const reason = data?.agent?.reason || data?.error || '请求失败';
+                if (resultPanel) resultPanel.style.display = 'block';
                 resultText.textContent = '失败：' + reason;
                 if (agentThoughts) {
                     const steps = [
@@ -636,8 +693,10 @@
                     mode: '自动驾驶'
                 });
                 renderVehicleInfo(vehicleState);
+                btn.style.display = 'block';
             }
         } catch (e) {
+            if (resultPanel) resultPanel.style.display = 'block';
             if (resultText) resultText.textContent = '网络错误：' + (e?.message || e);
             if (agentThoughts) {
                 runAgentFlow(agentThoughts, [
@@ -659,44 +718,7 @@
                 mode: '自动驾驶'
             });
             renderVehicleInfo(vehicleState);
-        }
-
-        const seq = ['v4.mp4','v2.mp4'];
-        let idx = 0;
-        playNext();
-
-        function playNext(){
-            if(idx < seq.length){
-                video.src = seq[idx];
-                video.load();
-                video.play().catch(()=>{});
-
-                if(seq[idx] === 'v4.mp4'){
-                    const onTime = function(){
-                        if(video.duration && video.currentTime >= video.duration - 0.05){
-                            video.removeEventListener('timeupdate', onTime);
-                            video.pause();
-                            setTimeout(()=>{ idx++; playNext(); }, 2000);
-                        }
-                    };
-                    video.addEventListener('timeupdate', onTime);
-
-                    const onEnded = function(){
-                        video.removeEventListener('ended', onEnded);
-                        setTimeout(()=>{ idx++; playNext(); }, 2000);
-                    };
-                    video.addEventListener('ended', onEnded);
-                } else {
-                    video.onended = function(){ video.onended = null; idx++; playNext(); };
-                }
-            } else {
-                // 切换到 v3 并恢复按钮
-                video.src = 'v3.mp4';
-                video.load();
-                video.play().catch(()=>{});
-                video.loop = true;
-                btn.style.display = 'block';
-            }
+            btn.style.display = 'block';
         }
     }
 })();
