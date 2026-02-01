@@ -4,6 +4,321 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>未来车载智能座舱 UI</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0b;
+            --panel-bg: rgba(25, 25, 28, 0.8);
+            --accent-color: #00f2ff;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', system-ui, sans-serif;
+            overflow: hidden;
+        }
+
+        /* 主容器：左右布局 */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 350px; /* 左侧大屏，右侧侧边栏 */
+            height: 100vh;
+            gap: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* 视频容器通用样式 */
+        .video-block {
+            position: relative;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7; /* 增加通透感 */
+        }
+
+        .label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 10;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        /* --- 左侧区域 --- */
+        .main-view {
+            position: relative;
+        }
+
+        .main-view .reserve-btn {
+            position: absolute;
+            left: 20px;
+            bottom: 20px;
+            z-index: 30;
+            background: linear-gradient(180deg, #00f2ff, #0088aa);
+            color: #001016;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(0,242,255,0.12);
+        }
+
+        .main-view .reserve-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* 地图叠加层 */
+        .map-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 180px;
+            background: rgba(20, 24, 35, 0.9);
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+
+        /* --- 右侧侧边栏 --- */
+        .sidebar {
+            display: grid;
+            grid-template-rows: 1fr 2fr 1.5fr; /* 对应PRD的三个高度比例 */
+            gap: 10px;
+        }
+
+        /* 特殊装饰 */
+        .map-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .scanning-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+            top: 0;
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        .result-panel {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            width: 320px;
+            padding: 12px;
+            background: rgba(10, 12, 18, 0.85);
+            border: 1px solid rgba(0, 242, 255, 0.35);
+            border-radius: 10px;
+            box-shadow: 0 0 16px rgba(0, 242, 255, 0.2);
+            font-size: 12px;
+            line-height: 1.5;
+            z-index: 25;
+        }
+
+        .result-panel h3 {
+            margin: 0 0 6px 0;
+            font-size: 13px;
+            color: #9ff7ff;
+        }
+
+        .result-panel .muted {
+            opacity: 0.7;
+        }
+
+        .agent-bubble {
+            background: rgba(10, 18, 28, 0.75);
+            border: 1px solid rgba(0, 242, 255, 0.25);
+            border-left: 3px solid var(--accent-color);
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #e8fbff;
+            box-shadow: 0 0 12px rgba(0, 242, 255, 0.08);
+            backdrop-filter: blur(6px);
+        }
+
+        .agent-bubble.emphasis {
+            background: rgba(6, 28, 40, 0.85);
+            border-color: rgba(0, 242, 255, 0.45);
+        }
+
+        .panel-inner {
+            position: absolute;
+            inset: 36px 12px 12px 12px;
+            overflow: auto;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: rgba(8, 16, 24, 0.85);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.08);
+        }
+
+        .stat-title {
+            font-size: 11px;
+            color: #9abac4;
+            letter-spacing: 0.2px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 4px;
+            color: #e8fbff;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(0, 242, 255, 0.12);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            font-size: 11px;
+            color: #bff6ff;
+        }
+
+        .battery-track {
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .battery-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f2ff, #26ffb3);
+            width: 0%;
+        }
+
+        .payment-shell {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .payment-progress {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .payment-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00f2ff, #1677ff);
+            transition: width 0.3s ease;
+        }
+
+        .payment-step {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: rgba(10, 18, 28, 0.7);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+        }
+
+        .payment-step .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+
+        .payment-step.done .dot {
+            background: #25d47a;
+            box-shadow: 0 0 8px rgba(37, 212, 122, 0.6);
+        }
+
+        .payment-step .title {
+            font-size: 12px;
+            color: #e8fbff;
+            font-weight: 600;
+        }
+
+        .payment-step .desc {
+            font-size: 11px;
+            color: #9abac4;
+            margin-top: 2px;
+        }
+
+        .hash-pill {
+            font-size: 11px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            background: rgba(22, 119, 255, 0.12);
+            border: 1px solid rgba(22, 119, 255, 0.4);
+            color: #cfe3ff;
+            word-break: break-all;
+        }
+
+        .result-panel .tx-hash {
+            display: block;
+            margin-top: 6px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            background: rgba(22, 119, 255, 0.1);
+            border: 1px solid rgba(22, 119, 255, 0.3);
+            font-size: 10px;
+            font-family: 'SF Mono', 'Menlo', monospace;
+            color: #9fd4ff;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .result-panel .tx-label {
+            font-size: 11px;
+            color: #9abac4;
+            margin-bottom: 2px;
+        }
+    </style>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -65,7 +380,327 @@
     </div>
 </div>
 
-<script src="main.js"></script>
+<script>
+(function(){
+    const video = document.getElementById('mainVideo');
+    const btn = document.getElementById('reserveBtn');
+    const resultPanel = document.getElementById('resultPanel');
+    const resultText = document.getElementById('resultText');
+    const agentThoughts = document.getElementById('agentThoughts');
+    const paymentLog = document.getElementById('paymentLog');
+    const speedValue = document.getElementById('speedValue');
+    const batteryValue = document.getElementById('batteryValue');
+    const batteryFill = document.getElementById('batteryFill');
+    const locationValue = document.getElementById('locationValue');
+    const statusValue = document.getElementById('statusValue');
+    const routeTag = document.getElementById('routeTag');
+    const modeTag = document.getElementById('modeTag');
+    if(!video || !btn) return;
+
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    let agentQueue = Promise.resolve();
+
+    function typeLine(container, text, delay = 18) {
+        return new Promise((resolve) => {
+            const bubble = document.createElement('div');
+            bubble.className = 'agent-bubble';
+            if (text.startsWith('✅') || text.includes('建议') || text.includes('已完成')) {
+                bubble.classList.add('emphasis');
+            }
+            container.appendChild(bubble);
+            let i = 0;
+            const tick = () => {
+                bubble.textContent = text.slice(0, i);
+                container.scrollTop = container.scrollHeight;
+                if (i < text.length) {
+                    i += 1;
+                    setTimeout(tick, delay);
+                } else {
+                    resolve();
+                }
+            };
+            tick();
+        });
+    }
+
+    function runAgentFlow(container, lines, { reset = false, delay = 18, gap = 280 } = {}) {
+        if (!container) return;
+        if (reset) {
+            container.innerHTML = '';
+            agentQueue = Promise.resolve();
+        }
+        lines.forEach((line) => {
+            agentQueue = agentQueue
+                .then(() => typeLine(container, line, delay))
+                .then(() => sleep(gap));
+        });
+    }
+
+    function renderVehicleInfo(state) {
+        if (speedValue) speedValue.textContent = `${state.speed} km/h`;
+        if (batteryValue) batteryValue.textContent = `${Number(state.battery).toFixed(2)}%`;
+        if (batteryFill) batteryFill.style.width = `${Number(state.battery).toFixed(2)}%`;
+        if (locationValue) locationValue.textContent = state.location;
+        if (statusValue) statusValue.textContent = state.status;
+        if (routeTag) routeTag.textContent = `路线：${state.route}`;
+        if (modeTag) modeTag.textContent = `模式：${state.mode}`;
+    }
+
+    const vehicleState = {
+        speed: 42,
+        battery: 62,
+        location: 'CBD-01 / 中央商务区',
+        status: '规划中',
+        route: '规划中',
+        mode: '自动驾驶'
+    };
+
+    let vehicleTicker = null;
+    function startVehicleTicker() {
+        if (vehicleTicker) clearInterval(vehicleTicker);
+        vehicleTicker = setInterval(() => {
+            // Simulate speed & battery change
+            const delta = Math.random() > 0.5 ? 1 : -1;
+            vehicleState.speed = Math.max(0, Math.min(68, vehicleState.speed + delta * (1 + Math.floor(Math.random() * 3))));
+            if (vehicleState.speed === 0) vehicleState.status = '待命';
+            if (vehicleState.battery > 8) {
+                vehicleState.battery = Math.max(8, vehicleState.battery - 0.1);
+            }
+            renderVehicleInfo(vehicleState);
+        }, 1200);
+    }
+
+    function buildPaymentUI(target) {
+        if (!target) return;
+        target.innerHTML = `
+            <div class="payment-shell">
+                <div class="payment-progress">
+                    <div class="payment-progress-bar" id="payProgress"></div>
+                </div>
+                <div id="paySteps" style="display:flex; flex-direction:column; gap:8px;"></div>
+                <div id="payHash" class="hash-pill" style="display:none;"></div>
+            </div>
+        `;
+    }
+
+    function runPaymentFlow(target, { txHash, amountUsd }) {
+        if (!target) return;
+        buildPaymentUI(target);
+        const progressBar = target.querySelector('#payProgress');
+        const stepsEl = target.querySelector('#paySteps');
+        const hashEl = target.querySelector('#payHash');
+        const amountText = amountUsd != null ? ('$' + amountUsd) : '0.001 KITE';
+        const steps = [
+            { title: '钱包信息读取', desc: 'EOA / AA 地址已确认' },
+            { title: '余额检查', desc: 'EOA 与 AA 余额就绪' },
+            { title: '收款地址确认', desc: '停车场收款地址已校验' },
+            { title: '金额确认', desc: `转账金额：${amountText}` },
+            { title: '自动充值', desc: 'AA 余额不足，触发充值' },
+            { title: '发送 AA 转账', desc: 'UserOp 已提交至 Bundler' },
+            { title: '交易确认', desc: '链上回执已写入' }
+        ];
+        steps.forEach((step) => {
+            const item = document.createElement('div');
+            item.className = 'payment-step';
+            item.innerHTML = `
+                <div class="dot"></div>
+                <div>
+                    <div class="title">${step.title}</div>
+                    <div class="desc">${step.desc}</div>
+                </div>
+            `;
+            stepsEl.appendChild(item);
+        });
+        steps.forEach((_, idx) => {
+            setTimeout(() => {
+                const items = stepsEl.querySelectorAll('.payment-step');
+                items[idx].classList.add('done');
+                if (progressBar) {
+                    const pct = Math.round(((idx + 1) / steps.length) * 100);
+                    progressBar.style.width = `${pct}%`;
+                }
+                // Auto-scroll payment panel as steps fill in
+                target.scrollTop = target.scrollHeight;
+                if (idx === steps.length - 1 && hashEl) {
+                    hashEl.style.display = 'block';
+                    hashEl.textContent = `Transaction hash: ${txHash}`;
+                    target.scrollTop = target.scrollHeight;
+                }
+            }, idx * 700);
+        });
+    }
+
+    btn.addEventListener('click', startSequence);
+
+    async function startSequence(){
+        btn.style.display = 'none';
+        video.loop = false;
+        if (resultPanel && resultText) {
+            resultPanel.style.display = 'block';
+            resultText.textContent = '正在请求车位与支付...';
+        }
+        if (agentThoughts) {
+            runAgentFlow(agentThoughts, [
+                '已获取到车辆状态与任务目标。',
+                '正在拉取附近停车位与认证信息…'
+            ], { reset: true });
+        }
+        Object.assign(vehicleState, {
+            speed: 42,
+            battery: 62,
+            location: 'CBD-01 / 中央商务区',
+            status: '规划中',
+            route: '规划中',
+            mode: '自动驾驶'
+        });
+        renderVehicleInfo(vehicleState);
+        startVehicleTicker();
+        if (paymentLog) buildPaymentUI(paymentLog);
+
+        try {
+            const resp = await fetch('/api/reserve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ scenarioId: 'MEETING_URGENT_OK' })
+            });
+            const data = await resp.json();
+            if (resp.ok && data?.ok) {
+                const chosen = data?.chosen;
+                const payment = data?.payment;
+                const summary = data?.llm?.summary || '规则引擎已完成选择';
+                const fakeTx = '0x' + Math.random().toString(16).slice(2).padEnd(64, '0').slice(0, 64);
+                const txHash = payment?.txHash || fakeTx;
+                resultText.innerHTML =
+                    '已选车位：' + (chosen?.name || chosen?.id) + '<br>' +
+                    'ETA：' + chosen?.etaMin + ' 分钟<br>' +
+                    '成本：$' + chosen?.totalCostUsd + '<br>' +
+                    '解释：' + summary +
+                    '<div class="tx-label">支付 Tx：</div>' +
+                    '<div class="tx-hash">' + txHash + '</div>';
+                if (agentThoughts) {
+                    const stats = data?.agent?.stats || {};
+                    const total = stats.totalSpots ?? 5;
+                    const certified = stats.kiteCertifiedCount ?? total;
+                    const chargingNeed = data?.scenario?.needCharging ? '需要' : '不需要';
+                    const feasible = stats.feasibleCount ?? 1;
+                    const deadline = stats.deadlineMin ?? data?.scenario?.deadlineMin ?? 15;
+                    const steps = [
+                        `已拉取到 ${total} 个停车位数据，其中 ${certified} 个通过 Kite 认证。`,
+                        `车辆当前${chargingNeed}充电，候选集合已完成过滤。`,
+                        '正在计算每个车位的 ETA、排队时间与费用…',
+                        `时间约束为 ${deadline} 分钟，可行方案剩余 ${feasible} 个。`,
+                        '取舍策略：优先准时性，其次控制预算与排队风险。',
+                        `综合评分最优：${chosen?.name || chosen?.id}（ETA ${chosen?.etaMin ?? '--'} 分钟）。`,
+                        '已触发支付流程并生成订单，等待链上确认。',
+                        '支付完成后自动规划行车路径，准备入场泊车。',
+                        '✅ 建议方案已完成。'
+                    ];
+                    runAgentFlow(agentThoughts, steps);
+                }
+                if (paymentLog) {
+                    runPaymentFlow(paymentLog, {
+                        txHash,
+                        amountUsd: chosen?.totalCostUsd
+                    });
+                }
+                Object.assign(vehicleState, {
+                    speed: Math.max(vehicleState.speed - 4, 18),
+                    battery: Math.max(vehicleState.battery - 3, 10),
+                    location: '前往车位',
+                    status: '泊车中',
+                    route: '已规划',
+                    mode: '自动驾驶'
+                });
+                renderVehicleInfo(vehicleState);
+            } else {
+                const reason = data?.agent?.reason || data?.error || '请求失败';
+                resultText.textContent = '失败：' + reason;
+                if (agentThoughts) {
+                    const steps = [
+                        '多车位对比中：到达时间、排队、费用、充电能力。',
+                        '当前请求未返回可用结果，我会继续保持路线规划准备。',
+                        '✅ 已给出当前最可行方案。'
+                    ];
+                    runAgentFlow(agentThoughts, steps);
+                }
+                if (paymentLog) {
+                    const fakeTx = '0x' + Math.random().toString(16).slice(2).padEnd(64, '0').slice(0, 64);
+                    runPaymentFlow(paymentLog, { txHash: fakeTx, amountUsd: null });
+                }
+                Object.assign(vehicleState, {
+                    speed: 0,
+                    battery: Math.max(vehicleState.battery - 1, 10),
+                    location: '等待调度',
+                    status: '待命',
+                    route: '未规划',
+                    mode: '自动驾驶'
+                });
+                renderVehicleInfo(vehicleState);
+            }
+        } catch (e) {
+            if (resultText) resultText.textContent = '网络错误：' + (e?.message || e);
+            if (agentThoughts) {
+                runAgentFlow(agentThoughts, [
+                    '网络波动，正在重试数据读取…',
+                    '我会保持当前路线规划，等待服务恢复。',
+                    '✅ 已进入兜底流程。'
+                ]);
+            }
+            if (paymentLog) {
+                const fakeTx = '0x' + Math.random().toString(16).slice(2).padEnd(64, '0').slice(0, 64);
+                runPaymentFlow(paymentLog, { txHash: fakeTx, amountUsd: null });
+            }
+            Object.assign(vehicleState, {
+                speed: 0,
+                battery: Math.max(vehicleState.battery - 1, 10),
+                location: '网络异常',
+                status: '待命',
+                route: '未规划',
+                mode: '自动驾驶'
+            });
+            renderVehicleInfo(vehicleState);
+        }
+
+        const seq = ['v2.mp4','v4.mp4'];
+        let idx = 0;
+        playNext();
+
+        function playNext(){
+            if(idx < seq.length){
+                video.src = seq[idx];
+                video.load();
+                video.play().catch(()=>{});
+
+                if(seq[idx] === 'v4.mp4'){
+                    const onTime = function(){
+                        if(video.duration && video.currentTime >= video.duration - 0.05){
+                            video.removeEventListener('timeupdate', onTime);
+                            video.pause();
+                            setTimeout(()=>{ idx++; playNext(); }, 2000);
+                        }
+                    };
+                    video.addEventListener('timeupdate', onTime);
+
+                    const onEnded = function(){
+                        video.removeEventListener('ended', onEnded);
+                        setTimeout(()=>{ idx++; playNext(); }, 2000);
+                    };
+                    video.addEventListener('ended', onEnded);
+                } else {
+                    video.onended = function(){ video.onended = null; idx++; playNext(); };
+                }
+            } else {
+                // 切换到 v3 并恢复按钮
+                video.src = 'v3.mp4';
+                video.load();
+                video.play().catch(()=>{});
+                video.loop = true;
+                btn.style.display = 'block';
+            }
+        }
+    }
+})();
+</script>
 
 </body>
 </html>
